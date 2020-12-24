@@ -18,35 +18,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "AGSortedList.h"
-
-struct Message
-{
-    char message[12]; //cant take int and int64_t as padding will make size 16 bytes
-};
-
-struct Buffer
-{
-    Buffer()
-    {
-        bufferSize_ = 0;
-    }
-
-    void moveToStart(size_t idx)
-    {
-        std::memcpy(buffer_, buffer_ + idx, bufferSize_ - idx);
-        bufferSize_ = bufferSize_ - idx;
-    }
-
-    void append(char* data, size_t len)
-    {
-        std::memcpy(buffer_ + bufferSize_, data, len);
-    }
-
-
-    char buffer_[2048];
-    size_t bufferSize_;
-};
+#include "Decoder.h"
+#include "EpollEventLoop.h"
 
 class ClientSession
 {
@@ -64,7 +37,7 @@ public:
     void setPortNumber(uint16_t port)
     {port_number_ = port;}
 
-    size_t closeSession()
+    void closeSession()
     {
         shutdown(socket_fd_, SHUT_RDWR);
     }
@@ -85,11 +58,11 @@ private:
     size_t lastIndex_;
     Buffer buffer_;
 
-    AGSorted_Elemets &sorted_list;
     int socket_fd_;
 
     std::string host_name_;
     uint16_t port_number_;
+    Decoder decoder_;
 };
 
 #endif //EPOLL_AGEXCHANGESESSION_H

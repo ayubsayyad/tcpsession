@@ -1,3 +1,4 @@
+#include <iostream>
 #include "ClientSession.h"
 
 bool ClientSession::connectSession()
@@ -33,45 +34,25 @@ bool ClientSession::connectSession()
 }
 
 bool ClientSession::sendData(const char* message, uint32_t message_length){
+    return true;
 }
 
-bool ClientSession::readAndProcessData()
-{
-    size_t numBytesRead = read(socket_fd_, buffer_.buffer_ + buffer_.bufferSize_, 2048 - buffer_.bufferSize_);
-    if (!numBytesRead)
-    {
+bool ClientSession::readAndProcessData(){
+    std::cout << "Reading" << std::endl;
+    auto& buffer = decoder_.buffer();
+    size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, 2048 - buffer.bufferSize_);
+    if (!numBytesRead){
         //socket closed, remove from epoll
         return false;
     }
 
-    buffer_.bufferSize_ += numBytesRead;
+    buffer.bufferSize_ += numBytesRead;
     processData();
 
     return true;
 }
 
-void ClientSession::processData()
-{
-    size_t currIdx = 0;
-    while ((buffer_.bufferSize_ - currIdx) >= sizeof(Message))
-    {
-        Message* msg = (Message*)&buffer_.buffer_[currIdx];
-        int64_t* exchangeVal = (int64_t*)&msg->message[4];
-        if(0 == *exchangeVal)
-        {
-            closeSession();
-            return;
-        }
-        lastIndex_ = sorted_list.insert(*exchangeVal, lastIndex_);
-        currIdx += sizeof(Message);
-    }
-    if((buffer_.bufferSize_ - currIdx))
-    {
-        buffer_.moveToStart(currIdx);
-    }
-    else
-    {
-        buffer_.bufferSize_ = 0;
-    }
+void ClientSession::processData(){
+    decoder_.decodeNProcess();
 }
 

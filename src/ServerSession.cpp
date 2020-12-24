@@ -75,6 +75,8 @@ void TCPServerSession::processEvent(){
         std::cout << "Error accepting connection \n";
         return;
     }
+
+    onConnect(client_addr, client);
 } 
 
 void TCPServerSession::onConnect(const sockaddr_in& client_addr, int fd){

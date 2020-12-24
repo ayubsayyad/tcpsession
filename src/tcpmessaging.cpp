@@ -19,9 +19,10 @@ int main(){
            );
     session.start();
 
+    //usleep(1000*1000)
 
     while(true){
-        usleep(1000*1000*1000);
-        std::cout << "Running ... " << std::endl;
+        //std::cout << "Running ... " << std::endl;
+        usleep(1000*1000);
     }
 }
