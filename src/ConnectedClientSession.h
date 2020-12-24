@@ -18,6 +18,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "Decoder.h"
+#include "EpollEventLoop.h"
 
 class ConnectedClientSession
 {
@@ -26,30 +27,41 @@ public:
     {
     }
 
-    bool connectSession();
+    bool configure();
+    bool setnoblocking();
     bool readAndProcessData();
     void processData();
 
-    size_t closeSession()
+    void closeSession()
     {
         shutdown(socket_fd_, SHUT_RDWR);
     }
 
+    void processEvent(){
+        onReadReady();
+    }
     bool onReadReady()
     {
         return readAndProcessData();
+    }
+
+    void setSocketFd(int socket_fd){
+        socket_fd_ = socket_fd;
     }
 
     int getSocketFd()
     {
         return socket_fd_;
     }
+    void setEventLoop(EPollEventLoop* epoll_event_loop);
+
 
 private:
     int socket_fd_;
     std::string host_name_;
     uint16_t port_number_;
 
+    EPollEventLoop* epoll_event_loop_;
     Decoder decoder_;
 };
 
