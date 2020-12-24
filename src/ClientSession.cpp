@@ -1,6 +1,6 @@
-#include "AGExchangeSession.h"
+#include "ClientSession.h"
 
-bool AGExchangeSession::connectSession()
+bool ClientSession::connectSession()
 {
     socket_fd_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -32,7 +32,10 @@ bool AGExchangeSession::connectSession()
     return true;
 }
 
-bool AGExchangeSession::readAndProcessData()
+bool ClientSession::sendData(const char* message, uint32_t message_length){
+}
+
+bool ClientSession::readAndProcessData()
 {
     size_t numBytesRead = read(socket_fd_, buffer_.buffer_ + buffer_.bufferSize_, 2048 - buffer_.bufferSize_);
     if (!numBytesRead)
@@ -47,7 +50,7 @@ bool AGExchangeSession::readAndProcessData()
     return true;
 }
 
-void AGExchangeSession::processData()
+void ClientSession::processData()
 {
     size_t currIdx = 0;
     while ((buffer_.bufferSize_ - currIdx) >= sizeof(Message))

@@ -1,5 +1,16 @@
 #include "ServerSession.h"
 #include "SessionContext.h"
+#include <memory>
+#include <string>
+
+void defaultOnNewConnectionHandler(const std::string& address, int fd)
+{
+    std::cout << "Connected : " <<  address << std::endl;
+}
+
+TCPServerSession::TCPServerSession(){
+    new_connection_handler_ = defaultOnNewConnectionHandler; 
+}
 
 bool TCPServerSession::init(){
     socket_fd_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -18,7 +29,6 @@ bool TCPServerSession::init(){
 
     return true;
 }
-
 
 bool TCPServerSession::start(){
     if (listen(socket_fd_, 0) < 0) {
@@ -65,9 +75,17 @@ void TCPServerSession::processEvent(){
         std::cout << "Error accepting connection \n";
         return;
     }
-    std::cout << "Client connected: " << inet_ntoa(client_addr.sin_addr) << std::endl;
-    //here create client session and start communication
 } 
+
+void TCPServerSession::onConnect(const sockaddr_in& client_addr, int fd){
+    std::string ipaddress = inet_ntoa(client_addr.sin_addr);
+    auto client = std::make_shared<ConnectedClientSession>();
+    client_session_map_.emplace(fd, client);
+    client->setSocketFd(fd);
+    client->setEventLoop(epoll_event_loop_);
+    client->configure();
+    new_connection_handler_(ipaddress, fd);
+}
 
 void TCPServerSession::setPort(int port){
     port_ = port;
@@ -77,3 +95,6 @@ void TCPServerSession::setEventLoop(EPollEventLoop* epoll_event_loop){
     epoll_event_loop_ = epoll_event_loop;
 }
 
+void TCPServerSession::setNewConnectionHandler(const on_new_connection_t& new_connection_handler){
+    new_connection_handler_ = new_connection_handler;
+}
