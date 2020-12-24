@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
 
 # add the executable
 
-add_library(tcpmessaginglib src/EpollEventLoop.cpp src/ServerSession.cpp)
+add_library(tcpmessaginglib src/EpollEventLoop.cpp src/ServerSession.cpp src/ConnectedClientSession.cpp src/ClientSession.cpp)
 target_link_libraries(tcpmessaginglib pthread rt)
 
 add_executable(tcpmessaging src/tcpmessaging.cpp)

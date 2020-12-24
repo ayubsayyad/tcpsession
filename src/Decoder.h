@@ -1,9 +1,13 @@
+#pragma once
+#include <iostream>
 #include "Buffer.h"
 #include "SampleMessages.h"
 
+
+
 class Decoder{
     public:
-        uint32_t decodeNProcess(){
+        void decodeNProcess(){
             int currIdx = 0;
             while ((buffer_.bufferSize_ - currIdx) >= sizeof(MessageHeader)){
                 MessageHeader* msg = (MessageHeader*)&buffer_.buffer_[currIdx];

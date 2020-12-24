@@ -3,7 +3,7 @@
 #include "ServerSession.h"
 struct SessionContext{
     int socket_fd_;
-    std::variant<TCPServerSession*> sessions_;
+    std::variant<TCPServerSession*, ConnectedClientSession*> sessions_;
 
     bool dispatch(){
         std::visit([](auto session) { session->processEvent();}, sessions_);

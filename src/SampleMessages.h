@@ -1,8 +1,8 @@
 #pragma once
 
 enum MessageType{
-    TEST_MESSAGE = 0;
-    TEST_MESSAGE2 = 2;
+    TEST_MESSAGE = 0,
+    TEST_MESSAGE2 = 2,
 };
 
 struct MessageHeader{

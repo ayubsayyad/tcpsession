@@ -48,15 +48,16 @@ struct Buffer
     size_t bufferSize_;
 };
 
-class AGExchangeSession
+class ClientSession
 {
 public:
-    AGExchangeSession(AGSorted_Elemets& elems) : sorted_list(elems)
+    ClientSession()
     {
         lastIndex_ = 0;
     }
 
     bool connectSession();
+    bool sendData(const char* message, uint32_t message_length);
     bool readAndProcessData();
     void processData();
 
