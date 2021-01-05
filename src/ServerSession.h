@@ -24,13 +24,13 @@
 
 class TCPServerSession{
     public:
-        typedef std::function<void(const std::string& ipaddress, int fd)> on_new_connection_t;
+        typedef std::function<void(const std::string& ipaddress, int fd, std::shared_ptr<ConnectedClientSession> connected_client)> on_new_connection_t;
 
         TCPServerSession();
         bool init();
         bool start();
         bool setnoblocking();
-        void processEvent();
+        bool processEvent();
         void onConnect(const sockaddr_in& client_addr, int fd);
 
         void setPort(int port);

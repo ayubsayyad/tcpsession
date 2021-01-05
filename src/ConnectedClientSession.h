@@ -37,8 +37,10 @@ public:
         shutdown(socket_fd_, SHUT_RDWR);
     }
 
-    void processEvent(){
-        onReadReady();
+    bool sendData(const char* message, uint32_t message_length);
+
+    bool processEvent(){
+        return onReadReady();
     }
     bool onReadReady()
     {

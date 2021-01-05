@@ -20,7 +20,7 @@ struct Buffer
     }
 
 
-    char buffer_[2048];
+    char buffer_[4096];
     size_t bufferSize_;
 };
 
