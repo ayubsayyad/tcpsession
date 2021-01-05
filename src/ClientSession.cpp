@@ -1,5 +1,6 @@
 #include <iostream>
 #include "ClientSession.h"
+#include "SessionContext.h"
 
 bool ClientSession::connectSession()
 {
@@ -16,6 +17,20 @@ bool ClientSession::connectSession()
         return false;
     }
 
+    if(!setnoblocking()){
+        std::cout << "error non blocking socket "  << errno << std::endl;
+        return false;
+    }
+
+    SessionContext* ctx = new SessionContext;
+    ctx->sessions_= this;
+    ctx->socket_fd_ = socket_fd_;
+    epoll_event_loop_->addSession(ctx);
+
+    return true;
+}
+
+bool ClientSession::setnoblocking(){
     int flags;
     flags = fcntl(socket_fd_, F_GETFL, 0);
     if ( flags < 0)
@@ -33,18 +48,33 @@ bool ClientSession::connectSession()
     return true;
 }
 
+void ClientSession::setEventLoop(EPollEventLoop* epoll_event_loop){
+    epoll_event_loop_ = epoll_event_loop;
+}
+
 bool ClientSession::sendData(const char* message, uint32_t message_length){
+    if(message_length != send(socket_fd_, message, message_length, 0)){
+        std::cout << "Failed To Send all bytes" << std::endl;
+        return false;
+    }
+
     return true;
+}
+
+bool ClientSession::processEvent(){
+    return readAndProcessData();
 }
 
 bool ClientSession::readAndProcessData(){
     std::cout << "Reading" << std::endl;
     auto& buffer = decoder_.buffer();
-    size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, 2048 - buffer.bufferSize_);
+    size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, 4096 - buffer.bufferSize_);
     if (!numBytesRead){
         //socket closed, remove from epoll
         return false;
     }
+
+    std::cout << "Buffer:" << buffer.buffer_  << std::endl;
 
     buffer.bufferSize_ += numBytesRead;
     processData();
@@ -55,4 +85,3 @@ bool ClientSession::readAndProcessData(){
 void ClientSession::processData(){
     decoder_.decodeNProcess();
 }
-

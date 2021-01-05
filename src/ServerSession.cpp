@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-void defaultOnNewConnectionHandler(const std::string& address, int fd)
+void defaultOnNewConnectionHandler(const std::string& address, int fd, std::shared_ptr<ConnectedClientSession> connected_client)
 {
     std::cout << "Connected : " <<  address << std::endl;
 }
@@ -67,16 +67,18 @@ bool TCPServerSession::setnoblocking(){
     return true;
 }
 
-void TCPServerSession::processEvent(){
+bool TCPServerSession::processEvent(){
     sockaddr_in client_addr;
     socklen_t ca_len = sizeof(client_addr);
     int client = accept(socket_fd_, (struct sockaddr *) &client_addr, &ca_len);
     if(client < 0) {
         std::cout << "Error accepting connection \n";
-        return;
+        return false;
     }
 
     onConnect(client_addr, client);
+
+    return true;
 } 
 
 void TCPServerSession::onConnect(const sockaddr_in& client_addr, int fd){
@@ -86,7 +88,7 @@ void TCPServerSession::onConnect(const sockaddr_in& client_addr, int fd){
     client->setSocketFd(fd);
     client->setEventLoop(epoll_event_loop_);
     client->configure();
-    new_connection_handler_(ipaddress, fd);
+    new_connection_handler_(ipaddress, fd, client);
 }
 
 void TCPServerSession::setPort(int port){

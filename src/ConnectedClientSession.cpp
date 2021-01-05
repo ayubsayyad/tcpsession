@@ -32,18 +32,30 @@ bool ConnectedClientSession::setnoblocking(){
     return true;
 }
 
+bool ConnectedClientSession::sendData(const char* message, uint32_t message_length){
+    if(message_length != send(socket_fd_, message, message_length, 0)){
+        std::cout << "Failed To Send all bytes" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+
 
 bool ConnectedClientSession::readAndProcessData(){
     std::cout << "Reading" << std::endl;
     auto& buffer = decoder_.buffer();
-    size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, 2048 - buffer.bufferSize_);
+    //size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, 2048 - buffer.bufferSize_);
+    size_t numBytesRead = read(socket_fd_, buffer.buffer_, 2048);
     if (!numBytesRead){
         //socket closed, remove from epoll
         return false;
     }
+    std::cout << "Buffer:" << buffer.buffer_  << std::endl;
 
-    buffer.bufferSize_ += numBytesRead;
-    processData();
+    //buffer.bufferSize_ += numBytesRead;
+    //processData();
 
     return true;
 }

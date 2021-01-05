@@ -1,6 +1,4 @@
-#ifndef EPOLL_AGEXCHANGESESSION_H
-#define EPOLL_AGEXCHANGESESSION_H
-
+#pragma once
 
 #include <memory>
 #include <cstdlib>
@@ -26,7 +24,6 @@ class ClientSession
 public:
     ClientSession()
     {
-        lastIndex_ = 0;
     }
 
     bool connectSession();
@@ -42,6 +39,8 @@ public:
         shutdown(socket_fd_, SHUT_RDWR);
     }
 
+    bool processEvent();
+
     bool onReadReady()
     {
         return readAndProcessData();
@@ -51,18 +50,16 @@ public:
     {
         return socket_fd_;
     }
+    bool setnoblocking();
+    void setEventLoop(EPollEventLoop* epoll_event_loop);
 
 private:
-    //keep last index inserted as exchange data is already sorted so
-    //next number will be inserted after this index
-    size_t lastIndex_;
-    Buffer buffer_;
 
     int socket_fd_;
 
     std::string host_name_;
     uint16_t port_number_;
     Decoder decoder_;
+    EPollEventLoop* epoll_event_loop_;
 };
 
-#endif //EPOLL_AGEXCHANGESESSION_H

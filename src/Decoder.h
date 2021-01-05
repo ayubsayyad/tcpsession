@@ -21,11 +21,11 @@ class Decoder{
                         break;
                     }
                 }
-                else if(msg->message_type_ == TEST_MESSAGE2){
-                    if((buffer_.bufferSize_ - currIdx) >= sizeof(TestMessage2)){
-                        TestMessage2* testMessage = (TestMessage2*)&buffer_.buffer_[currIdx];
-                        currIdx += sizeof(TestMessage2);
-                        std::cout << "Raise Callback 2:" << std::endl;
+                else if(msg->message_type_ == DATA_MESSAGE){
+                    if((buffer_.bufferSize_ - currIdx) >= sizeof(DataMessage)){
+                        DataMessage* testMessage = (DataMessage*)&buffer_.buffer_[currIdx];
+                        currIdx += sizeof(DataMessage);
+                        std::cout << "Data Message Received:" << testMessage->RawData_ << std::endl;
                     }
                     else{
                         break;
