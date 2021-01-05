@@ -1,5 +1,7 @@
-#include "DataSender.h"
 #include <fstream>
+#include <thread>
+#include <functional>
+#include "DataSender.h"
 #include "SampleMessages.h"
 
 
@@ -10,7 +12,14 @@ void DataSenderServer::init(){
     
 }
 
+
 void DataSenderServer::onClinetConnected(std::shared_ptr<ConnectedClientSession> conn_client){
+    auto thread_func = std::bind(&DataSenderServer::readAndSend, this, conn_client);
+    auto t = std::thread(thread_func);
+    t.detach();
+}
+
+void DataSenderServer::readAndSend(std::shared_ptr<ConnectedClientSession> conn_client){
     std::ifstream data_file;
     data_file.open(data_file_name_.c_str(), std::ios_base::in | std::ios_base::binary);
     char buffer[2048];
@@ -33,4 +42,3 @@ void DataSenderServer::onClinetConnected(std::shared_ptr<ConnectedClientSession>
 
     conn_client->sendData((const char*)&message, sizeof(message));
 }
-

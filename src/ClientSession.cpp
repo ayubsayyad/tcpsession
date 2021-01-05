@@ -68,7 +68,7 @@ bool ClientSession::processEvent(){
 bool ClientSession::readAndProcessData(){
     std::cout << "Reading" << std::endl;
     auto& buffer = decoder_.buffer();
-    size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, 4096 - buffer.bufferSize_);
+    size_t numBytesRead = read(socket_fd_, buffer.buffer_ + buffer.bufferSize_, Buffer::Buffer_Size - buffer.bufferSize_);
     if (!numBytesRead){
         //socket closed, remove from epoll
         return false;

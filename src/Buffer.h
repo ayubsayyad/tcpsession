@@ -1,9 +1,11 @@
 #pragma once
 #include <cstdlib>
 
-struct Buffer
+template<size_t BUFFER_SIZE = 4096>
+struct Basic_Buffer
 {
-    Buffer()
+    constexpr static size_t Buffer_Size = BUFFER_SIZE;
+    Basic_Buffer()
     {
         bufferSize_ = 0;
     }
@@ -20,8 +22,8 @@ struct Buffer
     }
 
 
-    char buffer_[4096];
+    char buffer_[BUFFER_SIZE];
     size_t bufferSize_;
 };
 
-
+typedef Basic_Buffer <4096> Buffer;
